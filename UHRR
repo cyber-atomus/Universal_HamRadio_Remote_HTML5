@@ -411,15 +411,12 @@ class TRXRIG:
 		
 	def setRPTMODE(self,RPTMODE):
 		try:
-#			print(VFO)
-#			self.rig.set_vfo(Hamlib.rig_parse_vfo(VFO))
 			print(RPTMODE)
 			if(RPTMODE=="RPT2M"):
 			    self.rig.set_rptr_shift(Hamlib.RIG_VFO_CURR,Hamlib.RIG_RPT_SHIFT_MINUS)
 			    self.rig.set_rptr_offs(Hamlib.RIG_VFO_CURR,int("600000"))
 			elif(RPTMODE=="SIMPLEX"):
 			    self.rig.set_rptr_shift(Hamlib.RIG_VFO_CURR,Hamlib.RIG_RPT_SHIFT_NONE)
-#			    self.rig.set_rptr_offs(Hamlib.RIG_VFO_CURR,"600000")
 			else:
 			    self.rig.set_rptr_shift(Hamlib.RIG_VFO_CURR,Hamlib.RIG_RPT_SHIFT_NONE)
 			self.getRPTMODE()
@@ -435,8 +432,8 @@ class TRXRIG:
 			else:
 			    self.rig.set_ctcss_tone(Hamlib.RIG_VFO_CURR,int(CTCSSTONE))
 			self.getCTCSSTONE()
-		except Exception as kuku:
-			print("Could not set the CTCSS via Hamlib!"+str(kuku))
+		except Exception as o:
+			print("Could not set the CTCSS via Hamlib!"+str(o))
 		return self.infos["CTCSSTONE"]
 		
 
@@ -447,8 +444,8 @@ class TRXRIG:
 			else:
 			    self.rig.set_ctcss_sql(Hamlib.RIG_VFO_CURR,int(CTCSSDECTONE))
 			self.getCTCSSDECTONE()
-		except Exception as kuku:
-			print("Could not set the CTCSS sql via Hamlib!"+str(kuku))
+		except Exception as o:
+			print("Could not set the CTCSS sql via Hamlib!"+str(o))
 		return self.infos["CTCSSDECTONE"]
 		
 	def getMode(self):
@@ -476,18 +473,17 @@ class TRXRIG:
 		try:
 		    (ctcsstone) = self.rig.get_func(Hamlib.RIG_VFO_CURR,Hamlib.RIG_FUNC_TONE)
 		    self.infos["CTCSSTONE"] = ctcsstone
-		except Exception as dupa:
-			print("Could not obtain the current CTCSS via Hamlib!"+str(dupa))
+		except Exception as o:
+			print("Could not obtain the current CTCSS via Hamlib!"+str(o))
 		return self.infos["CTCSSTONE"]
 		return ""
 
 	def getCTCSSDECTONE(self):
 		try:
 		    (ctcssdectone) = self.rig.get_func(Hamlib.RIG_VFO_CURR,Hamlib.RIG_FUNC_TSQL)
-		    print("KUPSKO:"+str(ctcssdectone))
 		    self.infos["CTCSSDECTONE"] = ctcssdectone
-		except Exception as dupa:
-			print("Could not obtain the current CTCSS via Hamlib!"+str(dupa))
+		except Exception as o:
+			print("Could not obtain the current CTCSS via Hamlib!"+str(o))
 		return self.infos["CTCSSDECTONE"]
 		return ""
 

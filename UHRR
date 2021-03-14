@@ -411,12 +411,15 @@ class TRXRIG:
 		
 	def setRPTMODE(self,RPTMODE):
 		try:
+#			print(VFO)
+#			self.rig.set_vfo(Hamlib.rig_parse_vfo(VFO))
 			print(RPTMODE)
 			if(RPTMODE=="RPT2M"):
 			    self.rig.set_rptr_shift(Hamlib.RIG_VFO_CURR,Hamlib.RIG_RPT_SHIFT_MINUS)
 			    self.rig.set_rptr_offs(Hamlib.RIG_VFO_CURR,int("600000"))
 			elif(RPTMODE=="SIMPLEX"):
 			    self.rig.set_rptr_shift(Hamlib.RIG_VFO_CURR,Hamlib.RIG_RPT_SHIFT_NONE)
+#			    self.rig.set_rptr_offs(Hamlib.RIG_VFO_CURR,"600000")
 			else:
 			    self.rig.set_rptr_shift(Hamlib.RIG_VFO_CURR,Hamlib.RIG_RPT_SHIFT_NONE)
 			self.getRPTMODE()
@@ -432,8 +435,8 @@ class TRXRIG:
 			else:
 			    self.rig.set_ctcss_tone(Hamlib.RIG_VFO_CURR,int(CTCSSTONE))
 			self.getCTCSSTONE()
-		except Exception as o:
-			print("Could not set the CTCSS via Hamlib!"+str(o))
+		except Exception as kuku:
+			print("Could not set the CTCSS via Hamlib!"+str(kuku))
 		return self.infos["CTCSSTONE"]
 		
 
@@ -473,17 +476,18 @@ class TRXRIG:
 		try:
 		    (ctcsstone) = self.rig.get_func(Hamlib.RIG_VFO_CURR,Hamlib.RIG_FUNC_TONE)
 		    self.infos["CTCSSTONE"] = ctcsstone
-		except Exception as e:
-			print("Could not obtain the current CTCSS via Hamlib!"+str(e))
+		except Exception as dupa:
+			print("Could not obtain the current CTCSS via Hamlib!"+str(dupa))
 		return self.infos["CTCSSTONE"]
 		return ""
 
 	def getCTCSSDECTONE(self):
 		try:
 		    (ctcssdectone) = self.rig.get_func(Hamlib.RIG_VFO_CURR,Hamlib.RIG_FUNC_TSQL)
+		    print("KUPSKO:"+str(ctcssdectone))
 		    self.infos["CTCSSDECTONE"] = ctcssdectone
-		except Exception as i:
-			print("Could not obtain the current CTCSS via Hamlib!"+str(i))
+		except Exception as dupa:
+			print("Could not obtain the current CTCSS via Hamlib!"+str(dupa))
 		return self.infos["CTCSSDECTONE"]
 		return ""
 
@@ -519,13 +523,13 @@ class TRXRIG:
 					subprocess.run(["aplay", "-c1", "-r44100", "-fS16_LE","-D"+device, "1750.wav"])
 					self.rig.set_ptt(Hamlib.RIG_VFO_CURR,Hamlib.RIG_PTT_OFF)
 				except:
-					print("Couldnt send a tone")
+					print("COuldnt send a tone")
 					self.rig.set_ptt(Hamlib.RIG_VFO_CURR,Hamlib.RIG_PTT_OFF)
 				self.infos["TONE"]=True
 			else:
 				self.infos["TONE"]=False
-		except Exception as d:
-			print("Could not set the 1750 via Hamlib!"+str(d))
+		except Exception as exc1:
+			print("Could not set the 1750 via Hamlib!"+str(exc1))
 		return self.infos["TONE"]
 		
 	def getTONE(self,status):
@@ -886,47 +890,33 @@ if __name__ == "__main__":
 		if is_rtlsdr_present:
 			threadFFT = loadFFTdata()
 			threadFFT.start()
+			
+		threadloadWavdata = loadWavdata()
+		threadloadWavdata.start()
 		
-		try:
-		    threadloadWavdata = loadWavdata()
-		    threadloadWavdata.start()
-		except Exception as u:
-			print("wavDBG"+str(u))
+		CTRX = TRXRIG()
 		
-		try:
-			CTRX = TRXRIG()
-		except Exception as u:
-			print("TXRIGDBG:"+str(u))
+		threadticksTRXRIG = ticksTRXRIG()
+		threadticksTRXRIG.start()
 		
-		try:
-		    threadticksTRXRIG = ticksTRXRIG()
-		    threadticksTRXRIG.start()
-		except Exception as u:
-		    print("threadDBG:"+str(u))
+		if(config['HAMLIB']['trxautopower']=="True"):
+			threadsurveilTRX = threadtimeoutTRXshutdown()
+			threadsurveilTRX.start()
 		
-		try:
-		    if(config['HAMLIB']['trxautopower']=="True"):
-			    threadsurveilTRX = threadtimeoutTRXshutdown()
-			    threadsurveilTRX.start()
-		except Exception as u:
-		    print("trxautoDBG:"+str(u))
-		try:
-		    app = tornado.web.Application([
-		    (r'/login', AuthLoginHandler),
-		    (r'/logout', AuthLogoutHandler),
-		    (r'/WSaudioRX', WS_AudioRXHandler),
-		    (r'/WSaudioTX', WS_AudioTXHandler),
-		    (r'/WSCTRX', WS_ControlTRX),
-		    (r'/WSpanFFT', WS_panFFTHandler),
-		    (r'/(panfft.*)', tornado.web.StaticFileHandler, { 'path' : './www/panadapter' }),
-		    (r'/CONFIG', ConfigHandler),
-		    (r'/', MainHandler),
-		    (r'/(.*)', tornado.web.StaticFileHandler, { 'path' : './www' })
-		    ],debug=bool(config['SERVER']['debug']), websocket_ping_interval=10, cookie_secret=config['SERVER']['cookie_secret'])
-		except Exception as u:
-		    print("APPDBG:"+str(u))
-	except Exception as x:
-		print("DEBUG: "+str(x))
+		
+		app = tornado.web.Application([
+		(r'/login', AuthLoginHandler),
+		(r'/logout', AuthLogoutHandler),
+		(r'/WSaudioRX', WS_AudioRXHandler),
+		(r'/WSaudioTX', WS_AudioTXHandler),
+		(r'/WSCTRX', WS_ControlTRX),
+		(r'/WSpanFFT', WS_panFFTHandler),
+		(r'/(panfft.*)', tornado.web.StaticFileHandler, { 'path' : './www/panadapter' }),
+		(r'/CONFIG', ConfigHandler),
+		(r'/', MainHandler),
+		(r'/(.*)', tornado.web.StaticFileHandler, { 'path' : './www' })
+		],debug=bool(config['SERVER']['debug']), websocket_ping_interval=10, cookie_secret=config['SERVER']['cookie_secret'])
+	except:
 		e = str(sys.exc_info())
 		print(e)
 		app = tornado.web.Application([
@@ -935,14 +925,11 @@ if __name__ == "__main__":
 		(r'/(.*)', tornado.web.StaticFileHandler, { 'path' : './www' })
 		],debug=bool(config['SERVER']['debug']))
 
-	try:
-	    http_server = tornado.httpserver.HTTPServer(app, ssl_options={
-	    "certfile": os.path.join(config['SERVER']['certfile']),
-	    "keyfile": os.path.join(config['SERVER']['keyfile']),
-	    })
-	    http_server.listen(int(config['SERVER']['port']))
-	    print('HTTP server started.')
-	    tornado.ioloop.IOLoop.instance().start()
-	except Exception as x:
-	    print("DEBUG HTTP:"+str(x))
+	http_server = tornado.httpserver.HTTPServer(app, ssl_options={
+	"certfile": os.path.join(config['SERVER']['certfile']),
+	"keyfile": os.path.join(config['SERVER']['keyfile']),
+	})
+	http_server.listen(int(config['SERVER']['port']))
+	print('HTTP server started.')
+	tornado.ioloop.IOLoop.instance().start()
 

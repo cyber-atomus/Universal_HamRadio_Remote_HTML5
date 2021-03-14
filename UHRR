@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*- 
 
 import os 
+import subprocess
 import tornado.httpserver
 import tornado.ioloop
 import tornado.web
@@ -333,6 +334,7 @@ class TRXRIG:
 		self.spoints = {"0":-54, "1":-48, "2":-42, "3":-36, "4":-30, "5":-24, "6":-18, "7":-12, "8":-6, "9":0, "10":10, "20":20, "30":30, "40":40, "50":50, "60":60}
 		self.infos = {}
 		self.infos["PTT"]=False
+		self.infos["TONE"]=False
 		self.infos["powerstat"]=False
 		self.serialport = Hamlib.hamlib_port_parm_serial
 		self.serialport.rate=config['HAMLIB']['rig_rate']
@@ -363,6 +365,9 @@ class TRXRIG:
 		
 		self.setPower(1)
 		self.getvfo()
+		self.getRPTMODE()
+		self.getCTCSSTONE()
+		self.getCTCSSDECTONE()
 		self.getFreq()
 		self.getMode()
 		
@@ -404,6 +409,45 @@ class TRXRIG:
 			print("Could not set the mode via Hamlib!")
 		return self.infos["MODE"]
 		
+	def setRPTMODE(self,RPTMODE):
+		try:
+			print(RPTMODE)
+			if(RPTMODE=="RPT2M"):
+			    self.rig.set_rptr_shift(Hamlib.RIG_VFO_CURR,Hamlib.RIG_RPT_SHIFT_MINUS)
+			    self.rig.set_rptr_offs(Hamlib.RIG_VFO_CURR,int("600000"))
+			elif(RPTMODE=="SIMPLEX"):
+			    self.rig.set_rptr_shift(Hamlib.RIG_VFO_CURR,Hamlib.RIG_RPT_SHIFT_NONE)
+			else:
+			    self.rig.set_rptr_shift(Hamlib.RIG_VFO_CURR,Hamlib.RIG_RPT_SHIFT_NONE)
+			self.getRPTMODE()
+		except Exception as e:
+			print("Could not set the SHIFT via Hamlib!"+str(e))
+		return self.infos["RPTMODE"]
+		
+
+	def setCTCSSTONE(self,CTCSSTONE):
+		try:
+			if(CTCSSTONE=="NONE"):
+			    self.rig.set_ctcss_tone(Hamlib.RIG_VFO_CURR,0)
+			else:
+			    self.rig.set_ctcss_tone(Hamlib.RIG_VFO_CURR,int(CTCSSTONE))
+			self.getCTCSSTONE()
+		except Exception as o:
+			print("Could not set the CTCSS via Hamlib!"+str(o))
+		return self.infos["CTCSSTONE"]
+		
+
+	def setCTCSSDECTONE(self,CTCSSDECTONE):
+		try:
+			if(CTCSSDECTONE=="NONE"):
+			    self.rig.set_ctcss_sql(Hamlib.RIG_VFO_CURR,0)
+			else:
+			    self.rig.set_ctcss_sql(Hamlib.RIG_VFO_CURR,int(CTCSSDECTONE))
+			self.getCTCSSDECTONE()
+		except Exception as kuku:
+			print("Could not set the CTCSS sql via Hamlib!"+str(kuku))
+		return self.infos["CTCSSDECTONE"]
+		
 	def getMode(self):
 		try:
 			(mode, width) = self.rig.get_mode()
@@ -412,6 +456,35 @@ class TRXRIG:
 		except:
 			print("Could not obtain the current Mode via Hamlib!")
 		return self.infos["MODE"]
+		return ""
+
+	def getRPTMODE(self):
+		try:
+			(shift) = self.rig.get_rptr_shift()
+			(offset) = self.rig.get_rptr_offs()
+			self.infos["RPTMODE"] = shift
+			self.infos["OFFSET"] = offset
+		except:
+			print("Could not obtain the current vfo via Hamlib!")
+		return self.infos["RPTMODE"]
+		return ""
+
+	def getCTCSSTONE(self):
+		try:
+		    (ctcsstone) = self.rig.get_func(Hamlib.RIG_VFO_CURR,Hamlib.RIG_FUNC_TONE)
+		    self.infos["CTCSSTONE"] = ctcsstone
+		except Exception as e:
+			print("Could not obtain the current CTCSS via Hamlib!"+str(e))
+		return self.infos["CTCSSTONE"]
+		return ""
+
+	def getCTCSSDECTONE(self):
+		try:
+		    (ctcssdectone) = self.rig.get_func(Hamlib.RIG_VFO_CURR,Hamlib.RIG_FUNC_TSQL)
+		    self.infos["CTCSSDECTONE"] = ctcssdectone
+		except Exception as i:
+			print("Could not obtain the current CTCSS via Hamlib!"+str(i))
+		return self.infos["CTCSSDECTONE"]
 		return ""
 
 	def getStrgLVL(self):
@@ -436,6 +509,27 @@ class TRXRIG:
 		
 	def getPTT(self,status):
 		return self.infos["PTT"]
+		
+	def setTONE(self,status):
+		try:
+			if status == "true":
+				try:
+					self.rig.set_ptt(Hamlib.RIG_VFO_CURR,Hamlib.RIG_PTT_ON)
+					device = config['AUDIO']['outputdevice']
+					subprocess.run(["aplay", "-c1", "-r44100", "-fS16_LE","-D"+device, "1750.wav"])
+					self.rig.set_ptt(Hamlib.RIG_VFO_CURR,Hamlib.RIG_PTT_OFF)
+				except:
+					print("Couldnt send a tone")
+					self.rig.set_ptt(Hamlib.RIG_VFO_CURR,Hamlib.RIG_PTT_OFF)
+				self.infos["TONE"]=True
+			else:
+				self.infos["TONE"]=False
+		except Exception as d:
+			print("Could not set the 1750 via Hamlib!"+str(d))
+		return self.infos["TONE"]
+		
+	def getTONE(self,status):
+		return self.infos["TONE"]
 		
 	def setPower(self,status=1):
 		try:
@@ -509,6 +603,20 @@ class WS_ControlTRX(tornado.websocket.WebSocketHandler):
 			yield self.send_to_all_clients("getMode:"+str(CTRX.getMode()))	
 		elif(action == "setMode"):
 			yield self.send_to_all_clients("getMode:"+str(CTRX.setMode(datato)))
+		elif(action == "setRPTMODE"):
+			yield self.send_to_all_clients("getRPTMODE:"+str(CTRX.setRPTMODE(datato)))
+		elif(action == "getRPTMODE"):
+			yield self.send_to_all_clients("getRPTMODE:"+str(CTRX.getRPTMODE()))
+		elif(action == "setCTCSSTONE"):
+			yield self.send_to_all_clients("getCTCSSTONE:"+str(CTRX.setCTCSSTONE(datato)))
+		elif(action == "getCTCSSTONE"):
+			yield self.send_to_all_clients("getCTCSSTONE:"+str(CTRX.getCTCSSTONE()))
+		elif(action == "setCTCSSDECTONE"):
+			yield self.send_to_all_clients("getCTCSSDECTONE:"+str(CTRX.setCTCSSDECTONE(datato)))
+		elif(action == "getCTCSSDECTONE"):
+			yield self.send_to_all_clients("getCTCSSDECTONE:"+str(CTRX.getCTCSSDECTONE()))
+		elif(action == "setTONE"):
+			yield self.send_to_all_clients("getTONE:"+str(CTRX.setTONE(datato)))	
 		elif(action == "setPTT"):
 			yield self.send_to_all_clients("getPTT:"+str(CTRX.setPTT(datato)))	
 

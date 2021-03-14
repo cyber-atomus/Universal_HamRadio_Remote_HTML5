@@ -406,6 +406,8 @@ function wsControlTRXopen(){
 	document.getElementById("indwsControlTRX").innerHTML='<img src="img/critsgreen.png">wsCtrl';
 	wsControlTRX.send("getFreq:");
 	wsControlTRX.send("getMode:");
+	wsControlTRX.send("getCTCSSTONE:");
+	wsControlTRX.send("getCTCSSDECTONE:");
 }
 
 function wsControlTRXclose(){
@@ -493,12 +495,40 @@ function sendTRXptt(stat){
 	if (wsControlTRX.readyState === WebSocket.OPEN) {wsControlTRX.send("setPTT:"+stat);}
 }	
 
+function sendTRXtone(stat){
+	if (wsControlTRX.readyState === WebSocket.OPEN) {wsControlTRX.send("setTONE:"+stat);}
+}	
+
 function showTRXmode(mode){
 	setAttr("div-mode_menu",mode);
 }
 
+function showRPTmode(mode){
+	setAttr("div-rpt_menu",mode);
+}
+
+function showCTCSStone(tone){
+	setAttr("div-ctcss_menu",tone);
+}
+
+function showCTCSSDECtone(tone){
+	setAttr("div-ctcssdec_menu",tonedec);
+}
+
 function sendTRXmode(){
 	if (wsControlTRX.readyState === WebSocket.OPEN) {wsControlTRX.send("setMode:"+event.srcElement.innerHTML);}
+}
+
+function sendRPTmode(){
+	if (wsControlTRX.readyState === WebSocket.OPEN) {wsControlTRX.send("setRPTMODE:"+event.srcElement.innerHTML);}
+}
+
+function sendCTCSStone(){
+	if (wsControlTRX.readyState === WebSocket.OPEN) {wsControlTRX.send("setCTCSSTONE:"+event.srcElement.innerHTML);}
+}
+
+function sendCTCSSDECtone(){
+	if (wsControlTRX.readyState === WebSocket.OPEN) {wsControlTRX.send("setCTCSSDECTONE:"+event.srcElement.innerHTML);}
 }
 
 function recall_hambands(){
@@ -569,6 +599,27 @@ function TXtogle(state="None")
 			toggleRecord();
 			toggleaudioRX();
 			sendTRXptt(false);
+		}
+	}
+}
+
+function TONEtogle(state="None")
+{
+	if(poweron && ((event.srcElement.className=="button_unpressed") || state=="True"))
+	{
+		button_pressed();
+//		toggleRecord(true);
+//		toggleaudioRX();
+		sendTRXtone(true);
+	}
+	else
+	{
+		button_unpressed();
+		if(poweron)
+		{
+//			toggleRecord();
+//			toggleaudioRX();
+			sendTRXtone(false);
 		}
 	}
 }

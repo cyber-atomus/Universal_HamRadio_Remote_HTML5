@@ -377,6 +377,23 @@ div#Rxmeters div.value {
 	text-align:center;
 }
 
+#div-TONE{
+	position:absolute;
+	left:50px;
+	top:650px;
+	width: 300px;
+	height: 100px;
+}
+#TONE-record
+{
+	text-align:center;
+	font:normal bold 30px tahoma;
+	height:50px;
+	width:100%;
+	display: inline-block;
+	padding-top: 10px;
+}
+
 #div-TX{
 	position:absolute;
 	left:1450px;
@@ -384,6 +401,8 @@ div#Rxmeters div.value {
 	width: 300px;
 	height: 200px;
 }
+
+
 #TX-record
 {
 	text-align:center;
@@ -392,7 +411,6 @@ div#Rxmeters div.value {
 	width:100%;
 	display: inline-block;
 }
-
 #TX-record_record_opus
 {
 	font:normal bold 10px tahoma;
@@ -534,6 +552,14 @@ div#Rxmeters div.value {
 	width: 450px;
 	height:200px;
 }
+#div-rpt_menu 
+{
+	position:absolute;
+	left: 950px;
+	bottom:100px;
+	width: 450px;
+	height:200px;
+}
 
 #div-mode_menu > ul
 {
@@ -554,6 +580,86 @@ div#Rxmeters div.value {
     vertical-align: middle;
     height: 100%;       
 }
+
+#div-rpt_menu 
+{
+	position:absolute;
+	left: 950px;
+	top: 590px;
+	width: 450px;
+	height:200px;
+}
+
+#div-rpt_menu > ul
+{
+	padding:0;
+	margin:0;
+	width:450px;
+	height:100%;
+}
+
+#div-rpt_menu > ul > li {
+    display: inline-block;
+	font: normal bold 25px tahoma;
+    text-align:center;
+    width:32%;
+    height: 40px;
+    padding-top: 5px;
+}
+
+
+#div-ctcss_menu 
+{
+	position:absolute;
+	left: 950px;
+	top: 660px;
+	width: 450px;
+	height: 200px;
+}
+
+#div-ctcss_menu > ul
+{
+	padding:0;
+	margin:0px;
+	width: 450px;
+}
+
+#div-ctcss_menu > ul > li {
+    display: inline-block;
+    font:normal bold 25px tahoma;
+    text-align:center;
+    width:32%;
+    height: 40px;
+    padding-top: 5px;
+    padding-bottom: 0px;
+}
+
+#div-ctcssdec_menu 
+{
+	position:absolute;
+	left: 950px;
+	top: 730px;
+	width: 450px;
+	height: 200px;
+}
+
+#div-ctcssdec_menu > ul
+{
+	padding:0;
+	margin:0px;
+	width: 450px;
+}
+
+#div-ctcssdec_menu > ul > li {
+    display: inline-block;
+    font:normal bold 25px tahoma;
+    text-align:center;
+    width:32%;
+    height: 40px;
+    padding-top: 5px;
+    padding-bottom: 0px;
+}
+
 
 .button_mode{
 	width:222px;

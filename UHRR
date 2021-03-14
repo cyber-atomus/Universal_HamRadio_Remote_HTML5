@@ -922,11 +922,14 @@ if __name__ == "__main__":
 		(r'/(.*)', tornado.web.StaticFileHandler, { 'path' : './www' })
 		],debug=bool(config['SERVER']['debug']))
 
-	http_server = tornado.httpserver.HTTPServer(app, ssl_options={
-	"certfile": os.path.join(config['SERVER']['certfile']),
-	"keyfile": os.path.join(config['SERVER']['keyfile']),
-	})
-	http_server.listen(int(config['SERVER']['port']))
-	print('HTTP server started.')
-	tornado.ioloop.IOLoop.instance().start()
+	try:
+	    http_server = tornado.httpserver.HTTPServer(app, ssl_options={
+	    "certfile": os.path.join(config['SERVER']['certfile']),
+	    "keyfile": os.path.join(config['SERVER']['keyfile']),
+	    })
+	    http_server.listen(int(config['SERVER']['port']))
+	    print('HTTP server started.')
+	    tornado.ioloop.IOLoop.instance().start()
+	except Exception as x:
+	    print("DEBUG HTTP:"+str(x))
 

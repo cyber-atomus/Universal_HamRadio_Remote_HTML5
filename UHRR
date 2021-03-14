@@ -886,32 +886,45 @@ if __name__ == "__main__":
 		if is_rtlsdr_present:
 			threadFFT = loadFFTdata()
 			threadFFT.start()
-			
-		threadloadWavdata = loadWavdata()
-		threadloadWavdata.start()
 		
-		CTRX = TRXRIG()
+		try:
+		    threadloadWavdata = loadWavdata()
+		    threadloadWavdata.start()
+		except Exception as u:
+			print("wavDBG"+str(u))
 		
-		threadticksTRXRIG = ticksTRXRIG()
-		threadticksTRXRIG.start()
+		try:
+			CTRX = TRXRIG()
+		except Exception as u:
+			print("TXRIGDBG:"+str(u))
 		
-		if(config['HAMLIB']['trxautopower']=="True"):
-			threadsurveilTRX = threadtimeoutTRXshutdown()
-			threadsurveilTRX.start()
+		try:
+		    threadticksTRXRIG = ticksTRXRIG()
+		    threadticksTRXRIG.start()
+		except Exception as u:
+		    print("threadDBG:"+str(u))
 		
-		
-		app = tornado.web.Application([
-		(r'/login', AuthLoginHandler),
-		(r'/logout', AuthLogoutHandler),
-		(r'/WSaudioRX', WS_AudioRXHandler),
-		(r'/WSaudioTX', WS_AudioTXHandler),
-		(r'/WSCTRX', WS_ControlTRX),
-		(r'/WSpanFFT', WS_panFFTHandler),
-		(r'/(panfft.*)', tornado.web.StaticFileHandler, { 'path' : './www/panadapter' }),
-		(r'/CONFIG', ConfigHandler),
-		(r'/', MainHandler),
-		(r'/(.*)', tornado.web.StaticFileHandler, { 'path' : './www' })
-		],debug=bool(config['SERVER']['debug']), websocket_ping_interval=10, cookie_secret=config['SERVER']['cookie_secret'])
+		try:
+		    if(config['HAMLIB']['trxautopower']=="True"):
+			    threadsurveilTRX = threadtimeoutTRXshutdown()
+			    threadsurveilTRX.start()
+		except Exception as u:
+		    print("trxautoDBG:"+str(u))
+		try:
+		    app = tornado.web.Application([
+		    (r'/login', AuthLoginHandler),
+		    (r'/logout', AuthLogoutHandler),
+		    (r'/WSaudioRX', WS_AudioRXHandler),
+		    (r'/WSaudioTX', WS_AudioTXHandler),
+		    (r'/WSCTRX', WS_ControlTRX),
+		    (r'/WSpanFFT', WS_panFFTHandler),
+		    (r'/(panfft.*)', tornado.web.StaticFileHandler, { 'path' : './www/panadapter' }),
+		    (r'/CONFIG', ConfigHandler),
+		    (r'/', MainHandler),
+		    (r'/(.*)', tornado.web.StaticFileHandler, { 'path' : './www' })
+		    ],debug=bool(config['SERVER']['debug']), websocket_ping_interval=10, cookie_secret=config['SERVER']['cookie_secret'])
+		except Exception as u:
+		    print("APPDBG:"+str(u))
 	except Exception as x:
 		print("DEBUG: "+str(x))
 		e = str(sys.exc_info())

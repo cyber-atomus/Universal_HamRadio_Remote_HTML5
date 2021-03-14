@@ -912,7 +912,8 @@ if __name__ == "__main__":
 		(r'/', MainHandler),
 		(r'/(.*)', tornado.web.StaticFileHandler, { 'path' : './www' })
 		],debug=bool(config['SERVER']['debug']), websocket_ping_interval=10, cookie_secret=config['SERVER']['cookie_secret'])
-	except:
+	except Exception as x:
+		print("DEBUG: "+str(x))
 		e = str(sys.exc_info())
 		print(e)
 		app = tornado.web.Application([

@@ -175,43 +175,15 @@
 				  <li onclick="togle_li();sendTRXmode();" class="button_mode button_unpressed">CW</li>
 				  <li onclick="togle_li();sendTRXmode();" class="button_mode button_unpressed">AM</li>
 				  <li onclick="togle_li();sendTRXmode();" class="button_mode button_unpressed">FM</li>
+				</ul>
 			</div>
 			
-			<div id="div-TONE">
-				<span onmousedown="TONEtogle('True');" onmouseup="TONEtogle('False');" class="button_unpressed" id="TONE-record">Ton 1750</span>	
-			</div>
 			<div id="div-TX">
 				<span onmousedown="TXtogle('True');" onmouseup="TXtogle('False');" class="button_unpressed" id="TX-record">TX</span>	
 				<span onclick="TXtogle();" class="button_unpressed" id="TX-record-lock">TX Lock</span>
 				<form id="TX-record_record_opus">
 					<input type="checkbox" id="encode" class=none alt="Encode TX with opus codec">Encode TX</input><br>
 				</form>
-			</div>
-			<div id="div-rpt_menu">
-			<center>RPT SHIFT</center>
-				<ul id="band_but">
-				  <li onclick="togle_li();sendRPTmode();" class="button_mode button_unpressed">RPT2M</li>
-				  <li onclick="togle_li();sendRPTmode();" class="button_mode button_unpressed">RPT70CM</li>
-				  <li onclick="togle_li();sendRPTmode();" class="button_mode button_unpressed">SIMPLEX</li>
-				</ul>
-			</div>
-
-			<div id="div-ctcss_menu">
-			<center>CTCSS ENCODE (turns off CTCSS SQL)</center>
-				<ul id="band_but">
-				  <li onclick="togle_li();sendCTCSStone();" class="button_mode button_unpressed">NONE</li>
-				  <li onclick="togle_li();sendCTCSStone();" class="button_mode button_unpressed">825</li>
-				  <li onclick="togle_li();sendCTCSStone();" class="button_mode button_unpressed">885</li>
-				</ul>
-			</div>
-
-			<div id="div-ctcssdec_menu">
-			<center>CTCSS SQUELCH AND ENCODE (stoopid ft897)</center>
-				<ul id="band_but">
-				  <li onclick="togle_li();sendCTCSSDECtone();" class="button_mode button_unpressed">NONE</li>
-				  <li onclick="togle_li();sendCTCSSDECtone();" class="button_mode button_unpressed">825</li>
-				  <li onclick="togle_li();sendCTCSSDECtone();" class="button_mode button_unpressed">885</li>
-				</ul>
 			</div>
 			
 			<div id="div-scoketscontrols">
